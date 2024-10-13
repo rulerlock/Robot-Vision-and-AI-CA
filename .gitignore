@@ -30,3 +30,7 @@ codegen/
 
 # Cloud based storage dotfile
 .MATLABDriveTag
+
+# Dataset
+dataset/*
+resources/
