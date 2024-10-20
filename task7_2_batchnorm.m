@@ -24,9 +24,9 @@ end
 
 
 % Network parameters
-layers = [128 * 128, 32 * 32, 8 * 8, 7]; % Deeper architecture
+layers = [128 * 128, 16 * 16, 8 * 8, 7]; % Deeper architecture
 initial_lr = 1e-3;
-epochs = 1000;
+epochs = 6000;
 varFrec = 50;
 
 
@@ -112,7 +112,7 @@ for i = 1:epochs
     
     %Learning rate scheduling: Reduce learning rate every 20 epochs
     if mod(i, 100) == 0
-        lr = lr * 0.99;
+        lr = lr * 0.8;
     end
     
     % Calculate and display metrics every 'varFrec' epochs
@@ -167,16 +167,18 @@ for i = 1:epochs
         % Reset timer
         lastVerifyTime = tic;
 
-        % Plot gradient max and min values dynamically
-        figure(2);
+        % Plot loss and accuracy
+        figure(1);
         clf;
         hold on;
-        plot(1:size(gradMaxValues, 1), gradMaxValues, '-r', 'LineWidth', 1.5);
-        plot(1:size(gradMinValues, 1), gradMinValues, '-b', 'LineWidth', 1.5);
-        title('Gradient Max and Min Values Over Epochs');
+        plot(1:size(trainLoss,2), trainLoss, '-*m', 'LineWidth', 1.5);
+        plot(1:size(trainAcc,2), trainAcc, '-ob', 'LineWidth', 1.5);
+        plot(1:size(testLoss,2), testLoss, '-*r', 'LineWidth', 1.5);
+        plot(1:size(testAcc,2), testAcc, '-og', 'LineWidth', 1.5);
+        title('Accuracy and Lost Values Over Epochs');
         xlabel('Verification Step');
-        ylabel('Gradient Value');
-        legend('Max Gradient', 'Min Gradient');
+        ylabel('Loss or Accuracy Value');
+        legend('trainLoss', 'trainAcc','testLoss', 'testAcc');
         grid on;
         drawnow;
     end
@@ -185,11 +187,11 @@ end
 % Plot results
 fig = figure;
 x = varFrec:varFrec:epochs;
-plot(x, trainLoss, '-*b', x, trainAcc * 100, '-ob', x, testLoss, '-*r', x, testAcc * 100, '-or');
-axis([0, epochs, 0, 100])
+plot(x, trainLoss, '-*m', x, trainAcc, '-ob', x, testLoss, '-*r', x, testAcc, '-og');
+axis([0, epochs, 0.5, 1.5])
 set(gca, 'XTick', [0:varFrec:epochs])
-set(gca, 'YTick', [0:5:100])
-legend('trainLoss', 'trainAcc (%)', 'testLoss', 'testAcc (%)');
+set(gca, 'YTick', [0.5:0.1:1.5])
+legend('trainLoss', 'trainAcc', 'testLoss', 'testAcc');
 xlabel('epoch')
 imwrite(frame2im(getframe(fig)), 'results.png');
 
