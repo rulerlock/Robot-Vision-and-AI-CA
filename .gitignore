@@ -34,3 +34,8 @@ codegen/
 # Dataset
 dataset/*
 resources/
+
+# Result data
+*.mat
+*.fig
+result_data/
