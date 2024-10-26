@@ -37,7 +37,7 @@ function [image_data, image_label] = load_data(which_set)
     
     % Convert cell array to matrix form (each row of X_train is a flattened image)
     X_train = cell2mat(X_train'); % Ensure conversion to matrix and arranged as rows
-    Y_train = Y_train;  % Labels are already in the desired format
+    % Y_train = Y_train;  % Labels are already in the desired format
     
     disp(string(which_set) + string(size(Y_train,1)) + ' images and labels successfully loaded');
 

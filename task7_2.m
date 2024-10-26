@@ -23,6 +23,8 @@ end
 [testFeatures, testLabels] = load_data('test');
 
 
+
+
 % Network parameters
 layers = [128 * 128, 16 * 16, 8 * 8, 7]; % Deeper architecture
 initial_lr = 1e-3;
