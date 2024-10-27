@@ -23,17 +23,23 @@ function [flatten_image, seg_image] = picture_preprocess()
         
         % Get the size of segmented images
         temp = imcrop(img_bin,[start_x+(i-1)*width,start_y,width,height]);
-        [rows, cols, ~] = size(temp); 
+        scaledImage = imresize(temp, 0.75);
+        [rows, cols, ~] = size(scaledImage); 
+
         
         % Add padding
         pad_top = floor((128 - rows) / 2);
         pad_bottom = 128 - rows - pad_top;
         pad_left = floor((128 - cols) / 2);
         pad_right = 128 - cols - pad_left;
-        padded_img = padarray(temp, [pad_top, pad_left], 0, 'pre');
+        padded_img = padarray(scaledImage, [pad_top, pad_left], 0, 'pre');
         padded_img = padarray(padded_img, [pad_bottom, pad_right], 0, 'post');
-        seg_image{end + 1} = padded_img;
-        flatten_image{end + 1} = padded_img(:)';
+
+        
+
+        inversed_img = imcomplement(padded_img);
+        seg_image{end + 1} = inversed_img;
+        flatten_image{end + 1} = inversed_img(:)';
         
         % subplot(2,5,i),imshow(padded_img)
     end
