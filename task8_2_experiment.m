@@ -12,14 +12,14 @@ labelDict = {'0', '4', '7', '8', 'A', 'D', 'H'};
 % lastVerifyTime = tic;
 
 % Check if GPU is available
-if gpuDeviceCount > 0
-    useGPU = true;
-    disp('GPU detected, using GPU for acceleration...');
-    mini_batch_size = 512; % Increase mini batch size for better GPU utilization
-else
+% if gpuDeviceCount > 0
+%     useGPU = true;
+%     disp('GPU detected, using GPU for acceleration...');
+%     mini_batch_size = 512; % Increase mini batch size for better GPU utilization
+% else
     useGPU = false;
-    disp('No GPU detected, using CPU...');
-end
+%     disp('No GPU detected, using CPU...');
+% end
 
 % Load dataset
 % [trainFeatures, trainLabels] = load_data('train');
@@ -148,7 +148,7 @@ for i = 1:epochs
 %             end
 %         end
 %         testAcc(end + 1) = acc;
-        disp(['test acc: ', num2str(acc)])
+        % disp(['test acc: ', num2str(acc)])
 %         
 %         % Display gradient information for debugging
 %         disp('Gradient statistics for each layer:');

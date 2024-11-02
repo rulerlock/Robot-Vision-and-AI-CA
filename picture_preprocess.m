@@ -34,7 +34,30 @@ function [flatten_image, seg_image] = picture_preprocess()
         pad_right = 128 - cols - pad_left;
         padded_img = padarray(scaledImage, [pad_top, pad_left], 0, 'pre');
         padded_img = padarray(padded_img, [pad_bottom, pad_right], 0, 'post');
+        
 
+
+
+        % 读取灰度图像
+        % I = imread('text_image.png'); % 请替换为你的图像文件路径
+        % I_gray = rgb2gray(I); % 若图像已是灰度图像可忽略此步
+        
+        % 二值化图像（假设文字为白色，背景为黑色）
+        BW = imbinarize(padded_img);
+        
+        % 检测文字的边缘
+        edges = edge(BW, 'Canny');
+        
+        % 设置填充的像素距离（例如5像素）
+        se = strel('disk', 2); % 创建5像素半径的圆形结构元素
+        dilated_edges = imdilate(edges, se);
+        
+        % 将膨胀后的边缘与原始图像叠加
+        filled_image = BW | dilated_edges;
+        filled_image = mat2gray(filled_image);
+        % 显示结果
+        % imshow(filled_image);
+        % title('文字边缘填充后的图像');
         
 
         inversed_img = imcomplement(padded_img);
@@ -102,6 +125,7 @@ function [flatten_image, seg_image] = picture_preprocess()
         is_bound=((top+bottom+left+right)==0);
     end
 end
+
 
 
 
