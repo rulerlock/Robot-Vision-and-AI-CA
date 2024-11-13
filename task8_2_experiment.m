@@ -3,7 +3,7 @@
 % Clear environment
 % clc; clear;
 
-[flatten_img, seg_img] = picture_preprocess();
+[flatten_img, seg_img] = picture_preprocess0();
 mini_batch_size = length(seg_img);
 
 labelDict = {'0', '4', '7', '8', 'A', 'D', 'H'}; 
@@ -55,7 +55,7 @@ end
 %% 
 
 numImages = size(testFeatures, 2);
-testImages = size(testLabels, 2);
+% testImages = size(testLabels, 1);
 % trainImages = size(trainLabels, 2);
 
 % Initialize network

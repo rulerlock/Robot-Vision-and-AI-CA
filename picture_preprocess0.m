@@ -1,4 +1,4 @@
-function [flatten_image, seg_image] = picture_preprocess()
+function [flatten_image, seg_image] = picture_preprocess0()
     img=imread("dataset\charact2.jpg");
     img_gray=rgb2gray(img);
     sub_img=imcrop(img_gray,[38.51	196.51	922.98	144.98]);
@@ -49,7 +49,7 @@ function [flatten_image, seg_image] = picture_preprocess()
         edges = edge(BW, 'Canny');
         
         % 设置填充的像素距离（例如5像素）
-        se = strel('disk', 3); % 创建5像素半径的圆形结构元素
+        se = strel('disk', 5); % 创建5像素半径的圆形结构元素
         dilated_edges = imdilate(edges, se);
         
         % 将膨胀后的边缘与原始图像叠加
@@ -60,7 +60,7 @@ function [flatten_image, seg_image] = picture_preprocess()
         % title('文字边缘填充后的图像');
         
 
-        inversed_img = imcomplement(filled_image);
+        inversed_img = imcomplement(padded_img);
         seg_image{end + 1} = inversed_img;
         flatten_image{end + 1} = inversed_img(:)';
         
