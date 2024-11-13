@@ -20,14 +20,14 @@ function [flatten_image, seg_image] = picture_preprocess()
     start_x=23;
     start_y=12;
     for i=1:10
-        
-        % Get the size of segmented images
+       
+        % Pre process 1: adjust size of segmented images
         temp = imcrop(img_bin,[start_x+(i-1)*width,start_y,width,height]);
-        scaledImage = imresize(temp, 0.75);
+        scaledImage = imresize(temp, 0.75);     % can adjust the character size here
         [rows, cols, ~] = size(scaledImage); 
 
         
-        % Add padding
+        % Pre process 2: Add padding - Expand the images to 128*128
         pad_top = floor((128 - rows) / 2);
         pad_bottom = 128 - rows - pad_top;
         pad_left = floor((128 - cols) / 2);
@@ -35,12 +35,7 @@ function [flatten_image, seg_image] = picture_preprocess()
         padded_img = padarray(scaledImage, [pad_top, pad_left], 0, 'pre');
         padded_img = padarray(padded_img, [pad_bottom, pad_right], 0, 'post');
         
-
-
-
-        % 读取灰度图像
-        % I = imread('text_image.png'); % 请替换为你的图像文件路径
-        % I_gray = rgb2gray(I); % 若图像已是灰度图像可忽略此步
+        % Pre process 2: Add padding - Expand the images to 128*128此步
         
         % 二值化图像（假设文字为白色，背景为黑色）
         BW = imbinarize(padded_img);
@@ -59,12 +54,13 @@ function [flatten_image, seg_image] = picture_preprocess()
         % imshow(filled_image);
         % title('文字边缘填充后的图像');
         
-
+        
+        % Last pre process: Inverse black-white (To take after training set)
         inversed_img = imcomplement(filled_image);
         seg_image{end + 1} = inversed_img;
         flatten_image{end + 1} = inversed_img(:)';
         
-        % subplot(2,5,i),imshow(padded_img)
+        % subplot(2,5,i),imshow(padded_img)     %Visualise pictures
     end
 
     flatten_image = cell2mat(flatten_image');
