@@ -1,4 +1,4 @@
-function [flatten_image, seg_image] = pic_preprocess_CNN()
+function [flatten_image, seg_image] = Pic_Preprocess_CNN()
     img=imread("dataset\charact2.jpg");
     img_gray=rgb2gray(img);
     sub_img=imcrop(img_gray,[38.51	196.51	922.98	144.98]);
@@ -26,7 +26,6 @@ function [flatten_image, seg_image] = pic_preprocess_CNN()
         scaledImage = imresize(temp, 0.75);
         [rows, cols, ~] = size(scaledImage); 
 
-        
         % Add padding
         pad_top = floor((128 - rows) / 2);
         pad_bottom = 128 - rows - pad_top;
@@ -35,9 +34,6 @@ function [flatten_image, seg_image] = pic_preprocess_CNN()
         padded_img = padarray(scaledImage, [pad_top, pad_left], 0, 'pre');
         padded_img = padarray(padded_img, [pad_bottom, pad_right], 0, 'post');
         
-
-
-
         % 读取灰度图像
         % I = imread('text_image.png'); % 请替换为你的图像文件路径
         % I_gray = rgb2gray(I); % 若图像已是灰度图像可忽略此步
@@ -59,7 +55,6 @@ function [flatten_image, seg_image] = pic_preprocess_CNN()
         % imshow(filled_image);
         % title('文字边缘填充后的图像');
         
-
         inversed_img = imcomplement(padded_img);
         seg_image{end + 1} = inversed_img;
         flatten_image{end + 1} = inversed_img(:)';
@@ -105,11 +100,7 @@ function [flatten_image, seg_image] = pic_preprocess_CNN()
         end
         img_bin=buffer;
     end
-    
-    
-    
-    
-    
+      
     function cr=create(sub_img,avg,high,bin)
         sub_img_1=avg_filter(sub_img,avg);
         sub_img_2=mat2gray(high_pass_filter(sub_img_1,high));
@@ -125,7 +116,3 @@ function [flatten_image, seg_image] = pic_preprocess_CNN()
         is_bound=((top+bottom+left+right)==0);
     end
 end
-
-
-
-
