@@ -49,7 +49,7 @@ function [flatten_image, seg_image] = picture_preprocess()
         edges = edge(BW, 'Canny');
         
         % 设置填充的像素距离（例如5像素）
-        se = strel('disk', 2); % 创建5像素半径的圆形结构元素
+        se = strel('disk', 5); % 创建5像素半径的圆形结构元素
         dilated_edges = imdilate(edges, se);
         
         % 将膨胀后的边缘与原始图像叠加

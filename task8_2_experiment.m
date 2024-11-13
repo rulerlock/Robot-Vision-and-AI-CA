@@ -12,14 +12,14 @@ labelDict = {'0', '4', '7', '8', 'A', 'D', 'H'};
 % lastVerifyTime = tic;
 
 % Check if GPU is available
-% if gpuDeviceCount > 0
-%     useGPU = true;
-%     disp('GPU detected, using GPU for acceleration...');
-%     mini_batch_size = 512; % Increase mini batch size for better GPU utilization
-% else
+if gpuDeviceCount > 0
+    useGPU = true;
+    disp('GPU detected, using GPU for acceleration...');
+    mini_batch_size = 512; % Increase mini batch size for better GPU utilization
+else
     useGPU = false;
-%     disp('No GPU detected, using CPU...');
-% end
+    disp('No GPU detected, using CPU...');
+end
 
 % Load dataset
 % [trainFeatures, trainLabels] = load_data('train');
@@ -52,14 +52,15 @@ if useGPU
     testFeatures = gpuArray(testFeatures);
     testLabels = gpuArray(testLabels);
 end
+%% 
 
 numImages = size(testFeatures, 2);
 testImages = size(testLabels, 2);
 % trainImages = size(trainLabels, 2);
 
 % Initialize network
-params = initialize_network(layers);
-moments = initialize_moments(layers); % Initialize moments for Adam optimizer
+% params = initialize_network(layers);
+% moments = initialize_moments(layers); % Initialize moments for Adam optimizer
 
 if useGPU
     for k = 1:length(params)
@@ -77,7 +78,7 @@ end
 testLoss = [];
 % trainAcc = [];
 testAcc = [];
-lr = initial_lr;
+% lr = initial_lr;
 gradMaxValues = [];
 gradMinValues = [];
 
@@ -291,7 +292,7 @@ function [AL, caches] = model_forward(X, params)
     for i = 1:L - 1
         A_prev = A;
         [Z, linear_cache] = linear_forward(A_prev, params{i}{1}, params{i}{2});
-        Z = batchnorm(Z); % Batch Normalization         
+%         Z = batchnorm(Z); % Batch Normalization         
         [A, activation_cache] = activation_function(Z, 'swish'); 
         caches{end + 1} = {linear_cache, activation_cache};
     end
