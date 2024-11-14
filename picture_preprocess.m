@@ -35,7 +35,7 @@ function [flatten_image, seg_image] = picture_preprocess()
         padded_img = padarray(scaledImage, [pad_top, pad_left], 0, 'pre');
         padded_img = padarray(padded_img, [pad_bottom, pad_right], 0, 'post');
         
-        % Pre process 2: Add padding - Expand the images to 128*128此步
+        % Pre process 3: 膨胀文字像素的边缘，使断开的笔画连续
         
         % 二值化图像（假设文字为白色，背景为黑色）
         BW = imbinarize(padded_img);
