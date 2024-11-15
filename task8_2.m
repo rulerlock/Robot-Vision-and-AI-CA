@@ -28,7 +28,7 @@ end
 % Network parameters
 layers = [128 * 128, 16 * 16, 8 * 8, 7]; % Deeper architecture
 initial_lr = 1e-3;
-epochs = 6000;
+epochs = 3000;
 varFrec = 50;
 
 
@@ -135,16 +135,17 @@ for i = 1:epochs
         disp(['test loss: ', num2str(loss)])
         testLoss(end + 1) = loss;
         acc = compute_accuracy(AL, testLabels);
-
-
-% 
-%         if i >= 250 && mod(i, 200) == 0
-%             if acc < 0.2
-%                 lr = 0.8;
-%             end
-%         end
         testAcc(end + 1) = acc;
         disp(['test acc: ', num2str(acc)])
+        
+%        % Save confusion matrix for the last verification step
+        if mod(i, 500) == 0
+            % Compute confusion matrix
+            [~, predictedLabels] = max(AL, [], 1); % Predicted labels (index of max probability)
+            [~, trueLabels] = max(testLabels, [], 1); % True labels (index of max one-hot encoded value)
+            confusionMat = confusionmat(trueLabels, predictedLabels); % Calculate confusion matrix
+            display_color_matrix(confusionMat);
+        end
         
         % Display gradient information for debugging
         disp('Gradient statistics for each layer:');
@@ -198,6 +199,102 @@ xlabel('epoch')
 imwrite(frame2im(getframe(fig)), 'results.png');
 
 % Function Definitions
+function display_color_matrix(matrix, filename)
+    % Display a color-coded matrix with custom colormap and value annotations
+    % Args:
+    %   matrix: The input matrix to visualize (e.g., confusion matrix)
+    %   filename (optional): Name of the file to save the visualization as an image
+
+    % Convert GPU array to regular array if needed
+    if isa(matrix, 'gpuArray')
+        matrix = gather(matrix); % Transfer matrix to CPU memory
+    end
+
+    % Create a mask for diagonal and non-diagonal elements
+    diagonal_mask = eye(size(matrix));
+    non_diagonal_mask = 1 - diagonal_mask;
+
+    % Separate diagonal and non-diagonal values
+    diagonal_values = matrix .* diagonal_mask;
+    non_diagonal_values = matrix .* non_diagonal_mask;
+
+    % Normalize each set of values independently for proper colormap scaling
+    max_diag = max(diagonal_values(:));
+    max_non_diag = max(non_diagonal_values(:));
+    if max_diag == 0, max_diag = 1; end % Avoid division by zero
+    if max_non_diag == 0, max_non_diag = 1; end
+
+    % Generate the final matrix for color mapping
+    color_matrix = matrix;
+    for i = 1:size(matrix, 1)
+        for j = 1:size(matrix, 2)
+            if i == j % Diagonal elements
+                color_matrix(i, j) = matrix(i, j) / max_diag; % Normalize diagonal
+            else % Non-diagonal elements
+                color_matrix(i, j) = matrix(i, j) / max_non_diag; % Normalize non-diagonal
+            end
+        end
+    end
+
+    % Create a new figure for the matrix visualization
+    figure;
+    imagesc(color_matrix); % Display the matrix as a color-coded image
+    hold on; % Enable overlay for annotations
+
+    % Define the colormap for diagonal and non-diagonal elements
+    colormap(create_colormap()); % Apply custom colormap
+    colorbar; % Add color bar to indicate intensity scale
+    title('Confusion Matrix');
+    xlabel('Predicted Labels');
+    ylabel('True Labels');
+    axis equal;
+    xticks(1:size(matrix, 2)); % Set x-tick positions
+    yticks(1:size(matrix, 1)); % Set y-tick positions
+%     set(gca, 'XTickLabel', 1:size(matrix, 2)); % Set x-tick labels as class numbers
+%     set(gca, 'YTickLabel', 1:size(matrix, 1)); % Set y-tick labels as class numbers
+    set(gca, 'XTickLabel', {'0', '4', '7', '8', 'A', 'D', 'H'}); % Set x-tick labels as class numbers
+    set(gca, 'YTickLabel', {'0', '4', '7', '8', 'A', 'D', 'H'}); % Set y-tick labels as class numbers
+
+    
+    set(gca, 'TickLength', [0 0]); % Remove tick marks
+    grid on;
+
+    % Annotate matrix with values
+    for i = 1:size(matrix, 1)
+        for j = 1:size(matrix, 2)
+            value = matrix(i, j);
+            if value ~= 0 % Skip zero values
+                text(j, i, num2str(value, '%.0f'), 'HorizontalAlignment', 'center', ...
+                    'VerticalAlignment', 'middle', 'Color', 'black', 'FontWeight', 'bold');
+            end
+        end
+    end
+
+    % Save the visualization as an image file, if filename is provided
+    if nargin > 1 && ~isempty(filename)
+        saveas(gcf, filename); % Save the figure to the specified filename
+    end
+end
+
+function cmap = create_colormap()
+    % Create a custom colormap for matrix visualization
+    % Returns:
+    %   cmap: Custom colormap for visualization
+
+    n = 256; % Number of colors
+
+    % Diagonal color gradient (white to blue)
+    white_to_blue = [linspace(1, 0, n)', linspace(1, 1, n)', linspace(1, 1, n)'];
+
+    % Non-diagonal color gradient (white to brown)
+    white_to_brown = [linspace(1, 0.6, n)', linspace(1, 0.3, n)', linspace(1, 0, n)'];
+
+    % Combine both gradients into one colormap
+    cmap = [white_to_blue];
+end
+
+
+
 
 function [A, cache] = activation_function(Z, activation_type)
     % Activation function switch to handle different activation types
