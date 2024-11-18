@@ -69,7 +69,7 @@ acc = mean(t);
 disp(['The testing accuracy is ', num2str(100 * acc), '%']);
 
 % Save the trained model
-save('CNNmodel.mat', 'trainedNet');
+save('trained_network\CNNmodel.mat', 'trainedNet');
 
 % Plot confusion matrix to obtain simulation accuracy
 plotconfusion(YValidation, YPredicted);
