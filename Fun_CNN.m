@@ -1,59 +1,59 @@
-% 函数：创建CNN卷积神经网络
-function [lgraph] = Fun_CNN(layers_num,filters_num,imgsize,numClasses)
+% Function: Create a CNN Convolutional Neural Network
+function [lgraph] = Fun_CNN(layers_num, filters_num, imgsize, numClasses)
 
-% 输入参数：
-% layers_num：卷积层的数量
-% filters_num：每个卷积层的卷积核数量
-% imgsize：网络输入图像的大小[高度, 宽度, 颜色通道]
-% numClasses：分类任务的类别数
+% Input parameters:
+% layers_num: Number of convolutional layers
+% filters_num: Number of filters in each convolutional layer
+% imgsize: Input image size for the network [height, width, color channels]
+% numClasses: Number of categories for the classification task
 
-% 定义输入层
-% 创建一个接受指定大小图像的输入层
-inputLayer = imageInputLayer(imgsize(1:3),'Name','input');
+% Define input layer
+% Create an input layer to accept images of the specified size
+inputLayer = imageInputLayer(imgsize(1:3), 'Name', 'input');
 
-% 定义输出层
-% 创建一个完全连接的层，然后是一个softmax层和一个分类层
-outputLayer = [ fullyConnectedLayer(filters_num*2^layers_num*2,'Name','FCoutput')
-fullyConnectedLayer(numClasses,'Name','FCoutput1')
-softmaxLayer('Name','softmax')
-classificationLayer('Name','classLayer')];
+% Define output layer
+% Create a fully connected layer, followed by a softmax layer and a classification layer
+outputLayer = [
+    fullyConnectedLayer(filters_num * 2^layers_num * 2, 'Name', 'FCoutput')
+    fullyConnectedLayer(numClasses, 'Name', 'FCoutput1')
+    softmaxLayer('Name', 'softmax')
+    classificationLayer('Name', 'classLayer')];
 
-%初始化网络
+% Initialize the network
 lgraph = layerGraph;
 
-% 将输入层添加到网络
-lgraph = addLayers(lgraph,inputLayer);
-inputString = 'input';% 设置卷积层输入的名称
+% Add the input layer to the network
+lgraph = addLayers(lgraph, inputLayer);
+inputString = 'input'; % Set the input name for the convolutional layers
 
-%定义卷积神经网络
-for i=1:layers_num
-    % 创建多个层：两个卷积层、一个批量归一化层、一个ReLU激活层和一个最大池化层
+% Define the convolutional neural network
+for i = 1:layers_num
+    % Create multiple layers: two convolutional layers, one batch normalization layer, one ReLU activation layer, and one max-pooling layer
 
     convLayer = [
-        convolution2dLayer(3,filters_num*2^i,'Padding','same','Name',['conv_' num2str(i) num2str(1)])%卷积层参数
-        convolution2dLayer(3,filters_num*2^i,'Padding','same','Name',['conv_' num2str(i) num2str(2)])%卷积层参数
-        batchNormalizationLayer('Name',['BN_' num2str(i)])%正则化层
-        reluLayer('Name',['relu_' num2str(i)])%激活函数层
-        maxPooling2dLayer(2,'Stride',2,'Name',['maxpool_' num2str(i)])
-        ];%最大池化层
+        convolution2dLayer(3, filters_num * 2^i, 'Padding', 'same', 'Name', ['conv_' num2str(i) num2str(1)]) % Convolution layer parameters
+        convolution2dLayer(3, filters_num * 2^i, 'Padding', 'same', 'Name', ['conv_' num2str(i) num2str(2)]) % Convolution layer parameters
+        batchNormalizationLayer('Name', ['BN_' num2str(i)]) % Regularization layer
+        reluLayer('Name', ['relu_' num2str(i)]) % Activation function layer
+        maxPooling2dLayer(2, 'Stride', 2, 'Name', ['maxpool_' num2str(i)]) % Max pooling layer
+        ];
 
-        % 将这些创建的层添加到网络
-        
-        lgraph = addLayers(lgraph,convLayer);
+    % Add these created layers to the network
+    lgraph = addLayers(lgraph, convLayer);
 
-        % 连接新添加的卷积层到网络
-        outputString = ['conv_' num2str(i) num2str(1)];
-        
-        % 每一层的输出连接到下一层的输入
-        lgraph = connectLayers(lgraph,inputString,outputString);
+    % Connect the newly added convolutional layers to the network
+    outputString = ['conv_' num2str(i) num2str(1)];
 
-        % 更新下一层的卷积层输入名称
-        inputString = ['maxpool_' num2str(i)];
+    % Connect the output of each layer to the input of the next layer
+    lgraph = connectLayers(lgraph, inputString, outputString);
+
+    % Update the input name for the next convolutional layer
+    inputString = ['maxpool_' num2str(i)];
 end
 
-%添加输出层
-lgraph = addLayers(lgraph,outputLayer);
+% Add the output layer
+lgraph = addLayers(lgraph, outputLayer);
 
-% 连接最后一个卷积层的输出到第一个全连接层
-lgraph = connectLayers(lgraph,inputString,'FCoutput');
+% Connect the output of the last convolutional layer to the first fully connected layer
+lgraph = connectLayers(lgraph, inputString, 'FCoutput');
 end
