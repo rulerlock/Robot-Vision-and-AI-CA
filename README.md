@@ -12,8 +12,8 @@ AY2024/2025 Group 19
 ├── Task1_to_7.m            # The main programme of task 1 to 7
 ├── Task8_1.m               # The main programme of task 8-1, CNN training
 ├── Task8_1_experiment.m    # The application of task 8-1 CNN to classify Image1
-├── Task8_1.m               # The main programme of task 8-2, MLP training
-├── Task8_1.m               # The application of task 8-2 MLP to classify Image1
+├── Task8_2.m               # The main programme of task 8-2, MLP training
+├── Task8_2_experiment.m    # The application of task 8-2 MLP to classify Image1
 └── trained_network         # Folder to save the trained network
 
 ```
