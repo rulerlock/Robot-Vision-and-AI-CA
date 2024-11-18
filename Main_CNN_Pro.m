@@ -31,22 +31,6 @@ analyzeNetwork(lgraph); % 分析网络结构
 global trainingMetrics
 trainingMetrics = struct('TrainingAccuracy', [], 'TrainingLoss', [], 'ValidationAccuracy', [], 'ValidationLoss', []);
 
-% 定义记录函数，获取训练和验证准确率、损失
-function stop = recordMetrics(info)
-    stop = false;
-    global trainingMetrics
-    if ~isempty(info.TrainingAccuracy)
-        % 记录训练集准确率和损失
-        trainingMetrics.TrainingAccuracy(end+1) = info.TrainingAccuracy;
-        trainingMetrics.TrainingLoss(end+1) = info.TrainingLoss;
-        % 记录验证集准确率和损失
-        if ~isempty(info.ValidationAccuracy)
-            trainingMetrics.ValidationAccuracy(end+1) = info.ValidationAccuracy;
-            trainingMetrics.ValidationLoss(end+1) = info.ValidationLoss;
-        end
-    end
-end
-
 %% 网络训练
 % 网络参数选择
 options = trainingOptions('adam', ...  % 使用Adam优化器
@@ -108,4 +92,21 @@ for i = 1:numImages
     subplot(4, 5, i)
     imshow(images{i})
     title(char(predictedLabels{i}))
+end
+
+
+% 定义记录函数，获取训练和验证准确率、损失
+function stop = recordMetrics(info)
+    stop = false;
+    global trainingMetrics
+    if ~isempty(info.TrainingAccuracy)
+        % 记录训练集准确率和损失
+        trainingMetrics.TrainingAccuracy(end+1) = info.TrainingAccuracy;
+        trainingMetrics.TrainingLoss(end+1) = info.TrainingLoss;
+        % 记录验证集准确率和损失
+        if ~isempty(info.ValidationAccuracy)
+            trainingMetrics.ValidationAccuracy(end+1) = info.ValidationAccuracy;
+            trainingMetrics.ValidationLoss(end+1) = info.ValidationLoss;
+        end
+    end
 end
