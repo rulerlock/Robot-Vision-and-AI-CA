@@ -3,7 +3,7 @@
 % Clear environment
 clc; clear;
 
-mini_batch_size = 64;
+mini_batch_size = 512;
 
 % Initialize timer
 lastVerifyTime = tic;
@@ -114,7 +114,8 @@ for i = 1:epochs
     
     %Learning rate scheduling: Reduce learning rate every 20 epochs
     if mod(i, 100) == 0
-        lr = lr * 0.8;
+%         lr = 0.5 * lr * (1 + cos(i* pi * epochs^(-1)));
+        lr = 0.8 * lr;
     end
     
     % Calculate and display metrics every 'varFrec' epochs
