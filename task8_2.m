@@ -22,22 +22,17 @@ end
 [trainFeatures, trainLabels] = load_data('train');
 [testFeatures, testLabels] = load_data('test');
 
-
-
-
 % Network parameters
 layers = [128 * 128, 16 * 16, 8 * 8, 7]; % Deeper architecture
 initial_lr = 1e-3;
 epochs = 3000;
 varFrec = 50;
 
-
 % Prepare dataset
 trainFeatures = double(trainFeatures)' / 255.0; % Normalize features
 testFeatures = double(testFeatures)' / 255.0;
 trainLabels = double(trainLabels)'; % Labels are now one-hot encoded
 testLabels = double(testLabels)'; % Labels are now one-hot encoded
-
 
 % Apply label smoothing
 smoothing_factor = 0.1;
@@ -145,31 +140,28 @@ for i = 1:epochs
             [~, predictedLabels] = max(AL, [], 1); % Predicted labels (index of max probability)
             [~, trueLabels] = max(testLabels, [], 1); % True labels (index of max one-hot encoded value)
             confusionMat = confusionmat(trueLabels, predictedLabels); % Calculate confusion matrix
-            display_color_matrix(confusionMat);
+%             display_color_matrix(confusionMat);
         end
         
-        % Display gradient information for debugging
-        disp('Gradient statistics for each layer:');
-        grad_max_vals = [];
-        grad_min_vals = [];
-        for l = 1:length(grads)
-            dW = grads{l}{2};
-            db = grads{l}{3};
-            grad_max_vals(end + 1) = max(dW(:));
-            grad_min_vals(end + 1) = min(dW(:));
-            disp(['Layer ', num2str(l), ' - dW max: ', num2str(max(dW(:))), ', dW min: ', num2str(min(dW(:))), ', db max: ', num2str(max(db(:))), ', db min: ', num2str(min(db(:)))]);
-        end
-        gradMaxValues = [gradMaxValues; grad_max_vals];
-        gradMinValues = [gradMinValues; grad_min_vals];
-
-
-
-        
+%         % Display gradient information for debugging
+%         disp('Gradient statistics for each layer:');
+%         grad_max_vals = [];
+%         grad_min_vals = [];
+%         for l = 1:length(grads)
+%             dW = grads{l}{2};
+%             db = grads{l}{3};
+%             grad_max_vals(end + 1) = max(dW(:));
+%             grad_min_vals(end + 1) = min(dW(:));
+%             disp(['Layer ', num2str(l), ' - dW max: ', num2str(max(dW(:))), ', dW min: ', num2str(min(dW(:))), ', db max: ', num2str(max(db(:))), ', db min: ', num2str(min(db(:)))]);
+%         end
+%         gradMaxValues = [gradMaxValues; grad_max_vals];
+%         gradMinValues = [gradMinValues; grad_min_vals];
+ 
         % Display elapsed time since last verification
-        elapsedTime = toc(lastVerifyTime);
-        disp(['Time since last verification: ', num2str(elapsedTime), ' seconds'])
+%         elapsedTime = toc(lastVerifyTime);
+%         disp(['Time since last verification: ', num2str(elapsedTime), ' seconds'])
         % Reset timer
-        lastVerifyTime = tic;
+%         lastVerifyTime = tic;
 
         % Plot loss and accuracy
         figure(1);
@@ -188,16 +180,33 @@ for i = 1:epochs
     end
 end
 
-% Plot results
+        % Display elapsed time since last verification
+        elapsedTime = toc(lastVerifyTime);
+        disp(['Time since last verification: ', num2str(elapsedTime), ' seconds'])
+
+
+
+% Plot confusion matrix
+display_color_matrix(confusionMat);
+
+% Plot loss and acc
 fig = figure;
 x = varFrec:varFrec:epochs;
 plot(x, trainLoss, '-*m', x, trainAcc, '-ob', x, testLoss, '-*r', x, testAcc, '-og');
 axis([0, epochs, 0.5, 1.5])
 set(gca, 'XTick', [0:varFrec:epochs])
 set(gca, 'YTick', [0.5:0.1:1.5])
-legend('trainLoss', 'trainAcc', 'testLoss', 'testAcc');
 xlabel('epoch')
-imwrite(frame2im(getframe(fig)), 'results.png');
+
+% Mark the max test acc on fig
+[maxTestAcc, idx] = max(testAcc);
+maxTestAccEpoch = x(idx);
+hold on;
+plot(maxTestAccEpoch, maxTestAcc, 'o', 'MarkerSize', 10, 'LineWidth', 2, 'Color', 'black'); 
+text(maxTestAccEpoch, maxTestAcc, sprintf('Max: %.2f', maxTestAcc), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
+legend('trainLoss', 'trainAcc', 'testLoss', 'testAcc', 'maxTestAcc');
+hold off;
+
 
 % Function Definitions
 function display_color_matrix(matrix, filename)
@@ -485,14 +494,9 @@ function acc = compute_accuracy(AL, Y)
 end
 
 function Z_norm = batchnorm(Z)
-    % Batch Normalization 操作
-    epsilon = 1e-8; % 防止除零
-    mu = mean(Z, 2); % 计算均值
-    sigma2 = var(Z, 0, 2); % 计算方差
-
-    % 标准化
+    % Batch Normalization 
+    epsilon = 1e-8; 
+    mu = mean(Z, 2); 
+    sigma2 = var(Z, 0, 2); 
     Z_norm = (Z - mu) ./ sqrt(sigma2 + epsilon);
-
-    % 可选的 scale 和 shift 参数（gamma 和 beta），可以用来提高灵活性
-    % 这里假设 gamma = 1, beta = 0，等价于只进行标准化
 end
