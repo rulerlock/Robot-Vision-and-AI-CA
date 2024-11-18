@@ -32,7 +32,6 @@ codegen/
 .MATLABDriveTag
 
 # Dataset
-dataset/*
 resources/
 
 # Result data
