@@ -1,4 +1,7 @@
-% MLP Picture Classification based on task7_2.m and task8.m
+%% Use trained MLP network to classify each character in Image1
+
+% Load the trained model
+load('trained_network\MLP_benchmark.mat'); % Ensure the trained network file is in the working directory
 
 % Clear environment
 % clc; clear;
